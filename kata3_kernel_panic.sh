@@ -1,0 +1,15 @@
+qemu-system-aarch64 \
+        -machine virt,usb=off,accel=kvm,gic-version=3,nvdimm -cpu host \
+        -m 2048M,slots=10,maxmem=31976M \
+        -device pcie-pci-bridge,bus=pcie.0,id=pcie-bridge-0,addr=2,romfile= \
+        -device virtio-serial-pci,disable-modern=false,id=serial0,romfile= \
+        -device virtconsole,chardev=charconsole0,id=console0 \
+        -chardev socket,id=charconsole0,path=console.sock,server,nowait \
+        -device virtio-scsi-pci,id=scsi0,disable-modern=false,romfile= \
+        -object rng-random,id=rng0,filename=/dev/urandom \
+        -device virtio-rng-pci,rng=rng0,romfile= \
+        -vga none -no-user-config -nodefaults -nographic \
+        -kernel vmlinuz-5.4.34-88 \
+        -append "init=/bin/bash console=hvc0 console=hvc1 console=earlycon root=/dev/pmem0p1 rootflags=data=ordered,errors=remount-ro ro rootfstype=ext4 debug systemd.show_status=true systemd.log_level=debug panic=1 nr_cpus=123 agent.use_vsock=false systemd.unit=kata-containers.target systemd.mask=systemd-networkd.service systemd.mask=systemd-networkd.socket scsi_mod.scan=none agent.log=debug agent.log=debug initcall_debug" \
+ -smp 1,cores=1,threads=1,sockets=123,maxcpus=123 \
+        -drive id=image-3da809c1d0297a2d,file=kata-containers-ubuntu-latest.img,aio=threads,format=raw,if=none,readonly
